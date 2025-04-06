@@ -1,0 +1,45 @@
+# Build artifacts
+/bin/
+/obj/
+
+# Go workspace
+/vendor/
+
+# Go project metadata
+*.test
+*.exe
+*.out
+*.a
+
+# IDE files (e.g., for VSCode, GoLand)
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Environment variables
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore Docker image files
+*.tar
+*.tar.gz
+
+# Ignore Docker volumes
+docker-volume/
+
+# Ignore Docker-related build cache
+.docker/
+
+# Ignore Docker Compose environment files (may contain sensitive data)
+.env
+
+# Ignore logs from Docker containers
+*.log
+
+# Ignore container data (use volumes for persistence)
+docker-data/
