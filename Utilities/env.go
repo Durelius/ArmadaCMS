@@ -3,6 +3,7 @@ package Utilities
 import (
 	"log"
 	"os"
+	"path/filepath"
 )
 
 func CheckEnvVariables(envVariables ...string) error {
@@ -14,4 +15,11 @@ func CheckEnvVariables(envVariables ...string) error {
 	}
 
 	return nil
+}
+func GetBasePath() string {
+	ex, err := os.Executable()
+	if err != nil {
+		return "."
+	}
+	return filepath.Dir(ex)
 }

@@ -9,6 +9,15 @@ import (
 	"net/http"
 )
 
+// @Summary Insert blogpost
+// @Description Insert new blogpost, requires authentication
+// @Tags blog
+// @Produce json
+// @Param   blogPost body Structure.NewBlogpost true "Blog post content"
+// @Param   Authorization header string true "Bearer token"
+// @Param   x-RefreshAuthorization header string true "Bearer token"
+// @Success 200 {object} boolean
+// @Router /insertblogpost [post]
 func InsertBlogpost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		log.Println("err")
@@ -33,11 +42,16 @@ func InsertBlogpost(w http.ResponseWriter, r *http.Request) {
 	}
 	db.InsertBlogpostDB(newBlogpost)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode("TODO")
+	json.NewEncoder(w).Encode(true)
 
 }
 
-// no security on getting blogposts
+// @Summary Get all blog posts
+// @Description Get list of all blog posts, no security here at all
+// @Tags blog
+// @Produce json
+// @Success 200 {object} []Structure.Blogpost
+// @Router /getallblogposts [get]
 func GetAllBlogposts(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		log.Println("err")

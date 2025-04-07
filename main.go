@@ -9,9 +9,16 @@ import (
 	"net/http"
 	"os"
 
+	_ "ArmadaCMS/docs"
+
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// @title Your API
+// @version 1.0
+// @description CMS API
+// @BasePath /api/cms
 func main() {
 	utilities.CheckEnvVariables("JWT_SECRET_ARMADA_CMS", "ENC_KEY_ARMADA_CMS", "DB_HOST", "DB_PORT", "API_PORT", "DB_USER",
 		"DB_PASSWORD",
@@ -39,6 +46,18 @@ func CreateMuxClient() http.Handler {
 }
 func CreateControllers(mux *mux.Router) *mux.Router {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	swaggerPath := "docs/swagger.json"
+	mux.HandleFunc("/api/cms/swagger.json", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Serving swagger.json")
+
+		w.Header().Set("Content-Type", "application/json")
+		http.ServeFile(w, r, swaggerPath)
+	})
+	mux.PathPrefix("/api/cms/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL("/api/cms/swagger.json"), // Must match your route
+		httpSwagger.PersistAuthorization(true),
+	))
 
 	mux.HandleFunc("/api/cms/newuser", Controllers.AddUser)
 	mux.HandleFunc("/api/cms/tokenlogin", Controllers.TokenLogin)

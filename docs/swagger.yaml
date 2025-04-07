@@ -1,0 +1,8 @@
+basePath: /api/cms
+info:
+  contact: {}
+  description: CMS API
+  title: Your API
+  version: "1.0"
+paths: {}
+swagger: "2.0"
