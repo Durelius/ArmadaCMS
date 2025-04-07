@@ -25,7 +25,6 @@ func ConnectDB() {
 	db, err := sqlx.Open("postgres", dsn)
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 	err = db.Ping()
 	if err != nil {

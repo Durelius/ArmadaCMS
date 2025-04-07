@@ -14,6 +14,9 @@ import (
 func main() {
 	db.ConnectDB()
 	defer db.DB.Close()
+
+	db.CreateTestTable()
+
 	port := os.Getenv("API_PORT")
 	wrappedMux := CreateMuxClient()
 	colonPort := fmt.Sprintf(":%s", port)
