@@ -1,15 +1,15 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-var DB *sql.DB
+var DB *sqlx.DB
 
 func ConnectDB() {
 	host := os.Getenv("DB_HOST")
@@ -22,7 +22,7 @@ func ConnectDB() {
 	dsn := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=%s",
 		user, password, host, port, dbname, sslmode)
 
-	db, err := sql.Open("postgres", dsn)
+	db, err := sqlx.Open("postgres", dsn)
 	if err != nil {
 		log.Fatal(err)
 		return

@@ -1,14 +1,13 @@
 package db
 
-import (
-	"log"
-)
+import "log"
 
 func TestQuery() string {
 	var test string
-	row := DB.QueryRow("SELECT test FROM testtable  WHERE id = $1 ", 1)
-	if err := row.Scan(&test); err != nil {
-		log.Fatalf("Error scanning row: %v", err)
+	testSelectSQL := "SELECT test FROM testtable WHERE id = $1"
+	err := DB.Get(&test, testSelectSQL, 1)
+	if err != nil {
+		log.Fatal(err)
 	}
 	return test
 
