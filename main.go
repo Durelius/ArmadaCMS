@@ -2,6 +2,7 @@ package main
 
 import (
 	"ArmadaCMS/Controllers"
+	utilities "ArmadaCMS/Utilities"
 	"ArmadaCMS/db"
 	"fmt"
 	"log"
@@ -12,10 +13,14 @@ import (
 )
 
 func main() {
+	utilities.CheckEnvVariables("JWT_SECRET_ARMADA_CMS", "ENC_KEY_ARMADA_CMS", "DB_HOST", "DB_PORT", "API_PORT", "DB_USER",
+		"DB_PASSWORD",
+		"DB_NAME",
+		"DB_SSLMODE")
 	db.ConnectDB()
 	defer db.DB.Close()
 
-	db.CreateTestTable()
+	db.CreateTables()
 
 	port := os.Getenv("API_PORT")
 	wrappedMux := CreateMuxClient()
@@ -35,8 +40,13 @@ func CreateMuxClient() http.Handler {
 func CreateControllers(mux *mux.Router) *mux.Router {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	mux.HandleFunc("/api/cms/testget", Controllers.ExampleGet)
-	mux.HandleFunc("/api/cms/testpost", Controllers.ExamplePost)
+	mux.HandleFunc("/api/cms/newuser", Controllers.AddUser)
+	mux.HandleFunc("/api/cms/tokenlogin", Controllers.TokenLogin)
+	mux.HandleFunc("/api/cms/refreshAccessToken", Controllers.RefreshAccessToken)
+	mux.HandleFunc("/api/cms/login", Controllers.Login)
+
+	mux.HandleFunc("/api/cms/insertblogpost", Controllers.InsertBlogpost)
+	mux.HandleFunc("/api/cms/getallblogposts", Controllers.GetAllBlogposts)
 
 	return mux
 }

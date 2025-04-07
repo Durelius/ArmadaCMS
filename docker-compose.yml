@@ -10,6 +10,8 @@ services:
     depends_on:
       - db
     environment:
+      JWT_SECRET_ARMADA_CMS: WaLaK4x0ODZjWt3sfKUkr7LlZxfHUz83
+      ENC_KEY_ARMADA_CMS: 52mKUQ8CoUIYCV0VJKWwbtI2NIbbor3s
       DB_HOST: db
       DB_PORT: 5432
       API_PORT: 3254
