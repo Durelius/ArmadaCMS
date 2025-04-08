@@ -41,7 +41,7 @@ func RefreshAccessToken(w http.ResponseWriter, r *http.Request) {
 
 	newAccessToken, _ := Utilities.GenerateAccessToken(*userId)
 
-	tokens := Structure.Tokens{RefreshToken: *rToken.RefreshToken, AccessToken: newAccessToken}
+	tokens := Structure.Tokens{RefreshToken: rToken.RefreshToken, AccessToken: newAccessToken}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(tokens)
 

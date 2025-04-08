@@ -14,7 +14,7 @@ func InsertRefreshToken(userId int, refreshToken string) bool {
 	}
 
 	refreshTokenDB := Structure.RefreshTokenDB{
-		RefreshToken: &refreshToken,
+		RefreshToken: refreshToken,
 		UserID:       userId,
 		ValidFrom:    time.Now(),
 		ValidTo:      time.Now().Add(7 * 24 * time.Hour), // Valid for 7 days
@@ -48,7 +48,7 @@ func MatchRefreshToken(refreshToken string, userId int) (*Structure.RefreshToken
 }
 
 func ExtendRefreshToken(rToken *Structure.RefreshTokenDB, validDuration int) (*Structure.RefreshTokenDB, error) {
-	if rToken.RefreshToken == nil {
+	if len(rToken.RefreshToken) == 0 {
 		log.Println("Refresh Token empty")
 		return nil, errors.New("refresh token empty")
 	}

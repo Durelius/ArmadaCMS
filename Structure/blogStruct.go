@@ -11,15 +11,16 @@ type NewBlogpost struct {
 	Tags   []string `json:"tags"`
 }
 type Blogpost struct {
-	ID        int           `gorm:"column:id;primaryKey;autoIncrement" json:"id"`
-	UserID    int           `gorm:"column:user_id" json:"-"`
-	User      User          `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"-"`
-	Text      string        `gorm:"column:text" json:"text"`
-	Title     string        `gorm:"column:title" json:"title"`
-	Author    string        `gorm:"column:author" json:"author"`
-	CreatedAt time.Time     `gorm:"column:created_at" json:"createdAt"`
-	Tags      []BlogpostTag `gorm:"foreignKey:BlogpostID"`
+	ID        int           `json:"id"  gorm:"primaryKey"`
+	UserID    int           `json:"userId"  gorm:"not null"`
+	User      User          `json:"user" gorm:"foreignKey:UserID;references:ID"`
+	Text      string        `json:"text" `
+	Title     string        `json:"title" `
+	Author    string        `json:"author" `
+	CreatedAt time.Time     `json:"createdAt" `
+	Tags      []BlogpostTag `json:"tags" gorm:"foreignKey:BlogpostID"`
 }
+
 type BlogpostTag struct {
 	ID         int
 	BlogpostID int // foreign key field

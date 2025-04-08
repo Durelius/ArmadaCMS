@@ -37,7 +37,7 @@ func VerifyUser(user Structure.User) (int, error) {
 		return 0, errors.New("invalid username or password")
 	}
 
-	return userDB.Id, nil
+	return userDB.ID, nil
 }
 
 func PopulateUserFromId(id int) (Structure.User, error) {

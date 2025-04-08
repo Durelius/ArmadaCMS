@@ -25,6 +25,8 @@ func main() {
 		"DB_NAME",
 		"DB_SSLMODE")
 	db.ConnectDB()
+	// db.DB.AutoMigrate(&Structure.User{}, &Structure.Blogpost{}, &Structure.BlogpostTag{}, &Structure.Tokens{}, &Structure.RefreshTokenDB{})
+
 	// defer db.DB.
 
 	// db.CreateTables()

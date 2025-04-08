@@ -11,13 +11,13 @@ import "time"
 //		Enabled      *bool     `db:"enabled"`
 //	}
 type RefreshTokenDB struct {
-	Id           *int      `gorm:"column:id;primaryKey;autoIncrement"`
-	RefreshToken *string   `gorm:"column:refresh_token"`
-	ValidFrom    time.Time `gorm:"column:valid_from"`
-	ValidTo      time.Time `gorm:"column:valid_to"`
-	UserID       int       `gorm:"column:user_id"`
-	User         User      `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"-"`
-	Enabled      bool      `gorm:"column:enabled"`
+	ID           int       `json:"id" gorm:"primaryKey"`
+	RefreshToken string    `json:"refreshToken" gorm:"unique;not null"`
+	ValidFrom    time.Time `json:"validFrom"`
+	ValidTo      time.Time `json:"validTo"`
+	UserID       int       `json:"userId" gorm:"not null"`
+	User         User      `json:"user" gorm:"foreignKey:UserID;references:ID"`
+	Enabled      bool      `json:"enabled"`
 }
 
 type Tokens struct {
