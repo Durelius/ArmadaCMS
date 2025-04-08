@@ -13,19 +13,19 @@ func InsertRefreshToken(userId int, refreshToken string) bool {
 		return false
 	}
 
-	const insertJwtTokenString string = `
-    INSERT INTO token (
-        refresh_token, 
-        user_id, 
-        valid_from, 
-        valid_to
-    ) VALUES($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '7 days')`
+	refreshTokenDB := Structure.RefreshTokenDB{
+		RefreshToken: &refreshToken,
+		UserID:       userId,
+		ValidFrom:    time.Now(),
+		ValidTo:      time.Now().Add(7 * 24 * time.Hour), // Valid for 7 days
+		Enabled:      true,
+	}
 
-	_, err := DB.Exec(insertJwtTokenString, refreshToken, userId)
-	if err != nil {
+	if err := DB.Create(&refreshTokenDB).Error; err != nil {
 		log.Printf("Error inserting refresh token: %v", err)
 		return false
 	}
+
 	return true
 }
 
@@ -37,15 +37,8 @@ func MatchRefreshToken(refreshToken string, userId int) (*Structure.RefreshToken
 		return nil, errors.New("refresh token empty")
 	}
 
-	const matchRefreshTokenQuery string = `
-    SELECT refresh_token, user_id, valid_from, valid_to
-    FROM token
-    WHERE refresh_token = $1
-    AND user_id = $2
-    AND enabled = true
-    `
-
-	err := DB.Get(&rTokenDb, matchRefreshTokenQuery, refreshToken, userId)
+	// Query to match the refresh token
+	err := DB.Where("refresh_token = ? AND user_id = ? AND enabled = true", refreshToken, userId).First(&rTokenDb).Error
 	if err != nil {
 		log.Printf("Error matching refresh token: %v", err)
 		return nil, err
@@ -53,38 +46,24 @@ func MatchRefreshToken(refreshToken string, userId int) (*Structure.RefreshToken
 
 	return &rTokenDb, nil
 }
+
 func ExtendRefreshToken(rToken *Structure.RefreshTokenDB, validDuration int) (*Structure.RefreshTokenDB, error) {
 	if rToken.RefreshToken == nil {
 		log.Println("Refresh Token empty")
 		return nil, errors.New("refresh token empty")
 	}
 
-	const extendRefreshTokenQuery string = `
-    UPDATE token
-    SET valid_to = CURRENT_TIMESTAMP + $1::interval
-    WHERE refresh_token = $2
-    AND user_id = $3
-    AND enabled = true
-    RETURNING valid_to
-    `
+	newValidTo := time.Now().Add(time.Duration(validDuration) * 24 * time.Hour)
 
-	interval := fmt.Sprintf("%d days", validDuration)
-
-	var newValidTo time.Time
-	err := DB.QueryRow(
-		extendRefreshTokenQuery,
-		interval,
-		rToken.RefreshToken,
-		rToken.UserID,
-	).Scan(&newValidTo)
+	err := DB.Model(&Structure.RefreshTokenDB{}).
+		Where("refresh_token = ? AND user_id = ? AND enabled = true", rToken.RefreshToken, rToken.UserID).
+		Update("valid_to", newValidTo).Error
 
 	if err != nil {
 		log.Printf("Error extending refresh token: %v", err)
 		return nil, fmt.Errorf("failed to extend token: %w", err)
 	}
 
-	updatedToken := *rToken
-	updatedToken.ValidTo = newValidTo
-
-	return &updatedToken, nil
+	rToken.ValidTo = newValidTo
+	return rToken, nil
 }

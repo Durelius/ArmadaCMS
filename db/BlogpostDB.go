@@ -2,53 +2,49 @@ package db
 
 import (
 	"ArmadaCMS/Structure"
-	"log"
 )
 
-func InsertBlogpostDB(blogpost Structure.NewBlogpost) {
-	const insertBlogPostSQL string = `
-	INSERT INTO blogpost(text, title, author) VALUES($1,$2,$3)
-	  ;`
-	res, err := DB.Exec(insertBlogPostSQL, blogpost.Text, blogpost.Title, blogpost.Author)
-	if err != nil {
-		log.Fatal(err)
+func InsertBlogpostDB(blogpost Structure.NewBlogpost, userId int) error {
+	// 1. Create the Blogpost
+	post := Structure.Blogpost{
+		Text:   blogpost.Text,
+		Title:  blogpost.Title,
+		Author: blogpost.Author,
+		UserID: userId,
 	}
-	const insertBlogPostTagsSQL string = `
-	INSERT INTO blogpost_tags(blogpost_id, tag) VALUES($1, $2)
-	  ;`
-	blogpostId, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal(err)
+
+	// Insert the blog post into the database
+	if err := DB.Create(&post).Error; err != nil {
+		return err
 	}
+
+	// 2. Create BlogpostTags and associate them with the Blogpost
+	var tagEntries []Structure.BlogpostTag
 	for _, tag := range blogpost.Tags {
-		_, err = DB.Exec(insertBlogPostTagsSQL, blogpostId, tag)
-		if err != nil {
-			log.Fatal(err)
+		// Create a BlogpostTag for each tag
+		tagEntries = append(tagEntries, Structure.BlogpostTag{
+			BlogpostID: post.ID, // Associate with the created blog post
+			Tag:        tag,
+		})
+	}
+
+	// Insert the tags into the database
+	if len(tagEntries) > 0 {
+		if err := DB.Create(&tagEntries).Error; err != nil {
+			return err
 		}
 	}
+
+	// Success
+	return nil
 }
-func GetAllBlogpostsDB() []Structure.Blogpost {
-	const selectBlogPostSQL string = `
-	SELECT *
-	FROM blogpost
-	  ;`
+
+func GetAllBlogpostsDB() ([]Structure.Blogpost, error) {
 	var blogposts []Structure.Blogpost
-	err := DB.Select(&blogposts, selectBlogPostSQL)
-	if err != nil {
-		log.Fatal(err)
+
+	if err := DB.Preload("Tags").Find(&blogposts).Error; err != nil {
+		return nil, err
 	}
 
-	const selectBlogPostTagsSQL string = `
-		SELECT *
-		FROM blogpost_tags
-		WHERE blogpost_id = $1
-		  ;`
-	for _, blogpost := range blogposts {
-		err := DB.Select(&blogpost.Tags, selectBlogPostTagsSQL, blogpost.Id)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	return blogposts
-
+	return blogposts, nil
 }

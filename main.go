@@ -25,9 +25,9 @@ func main() {
 		"DB_NAME",
 		"DB_SSLMODE")
 	db.ConnectDB()
-	defer db.DB.Close()
+	// defer db.DB.
 
-	db.CreateTables()
+	// db.CreateTables()
 
 	port := os.Getenv("API_PORT")
 	wrappedMux := CreateMuxClient()

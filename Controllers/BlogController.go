@@ -40,7 +40,7 @@ func InsertBlogpost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body (323) IBP", http.StatusBadRequest)
 		return
 	}
-	db.InsertBlogpostDB(newBlogpost)
+	db.InsertBlogpostDB(newBlogpost, *userId)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(true)
 
@@ -59,7 +59,10 @@ func GetAllBlogposts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	blogposts := db.GetAllBlogpostsDB()
+	blogposts, err := db.GetAllBlogpostsDB()
+	if err != nil {
+		log.Fatalf("test")
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(blogposts)

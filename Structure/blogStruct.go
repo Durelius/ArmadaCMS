@@ -1,6 +1,8 @@
 package Structure
 
-import "time"
+import (
+	"time"
+)
 
 type NewBlogpost struct {
 	Text   string   `json:"text"`
@@ -9,11 +11,17 @@ type NewBlogpost struct {
 	Tags   []string `json:"tags"`
 }
 type Blogpost struct {
-	Id        int       `json:"id" db:"id"`
-	UserId    int       `json:"userId" db:"user_id"`
-	Text      string    `json:"text" db:"text"`
-	Title     string    `json:"title" db:"title"`
-	Author    string    `json:"author" db:"author"`
-	CreatedAt time.Time `json:"createdAt" db:"created_at"`
-	Tags      []string  `json:"tags" db:"tags"`
+	ID        int           `gorm:"column:id;primaryKey;autoIncrement" json:"id"`
+	UserID    int           `gorm:"column:user_id" json:"-"`
+	User      User          `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"-"`
+	Text      string        `gorm:"column:text" json:"text"`
+	Title     string        `gorm:"column:title" json:"title"`
+	Author    string        `gorm:"column:author" json:"author"`
+	CreatedAt time.Time     `gorm:"column:created_at" json:"createdAt"`
+	Tags      []BlogpostTag `gorm:"foreignKey:BlogpostID"`
+}
+type BlogpostTag struct {
+	ID         int
+	BlogpostID int // foreign key field
+	Tag        string
 }
